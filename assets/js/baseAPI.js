@@ -1,30 +1,10 @@
-// $.ajaxPrefilter()  可以在ajax  get post 之前截取
-// 开发环境服务器
-let baseUrl = 'http://api-breakingnews-web.itheima.net'
-// 测试环境服务器
-// let baseUrl = 'http://api-breakingnews-web.itheima.net'
-// 生产环境服务器
-// let baseUrl = 'http://api-breakingnews-web.itheima.net'
+// 注意：每次调用$.get或$.post()或$.ajax()的时候
+//会先调用 ajaxPrefilter这个函数
+//在这个函数中可以拿到我们ajax提供的配置对象
+$.ajaxPrefilter(function(options){
+    
+    //在发起真正的ajax请求之前，统一拼接请求的根路径
+    options.url = 'http://www.liulongbin.top:3007'+options.url
 
-$.ajaxPrefilter(function (origin) {
-    // console.log(origin);
-    origin.url = baseUrl + origin.url
-
-    // 身份认证
-    if (origin.url.indexOf('/my/') != -1) {
-        origin.headers = {
-            Authorization: localStorage.getItem('token') || ''
-        }
-        // 信息拦截
-        origin.complete = function (res) {
-            // console.log(res.responseJSON);
-            let obj = res.responseJSON;
-            if (obj.status == 1 && obj.message == "身份认证失败！") {
-                // 跳转页面
-                location.href = '/login.html'
-                // 本地销毁token
-                localStorage.removeItem('token');
-            }
-        }
-    };
+    console.log(options.url)
 })

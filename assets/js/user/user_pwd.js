@@ -1,43 +1,43 @@
-// 入口函数
-$(function () {
+$(function(){
+    var form = layui.form
 
-    // 密码判定
-    let form = layui.form
+
     form.verify({
-        rew: [
+        pwd:[
             /^[\S]{6,12}$/
-            , '密码必须6到12位，且不能出现空格'
-        ],
-        // 判断新密码不能和旧密码一样
-        samePwd: function (value) {
-            let val = $('[name=oldPwd]').val();
-            if (value === val) {
-                return "新密码不能和原密码相同"
-            }
-        },
-        // 判断确认新密码和新密码必须一样
-        rePwd: function (value) {
-            let val = $('[name=newPwd]').val();
-            if (value != val) {
-                return "确认新密码和新密码必须相同"
+            ,'密码必须6到12位，且不能出现空格'
+          ],
+        samePwd: function(value){
+              if(value === $('[name=oldPwd]').val())
+              {
+                  return '新旧密码不能相同!'
+              }
+          },
+        rePwd: function(value){
+            if(value !== $('[name=newPwd]').val()){
+                return '两次密码不一致！'
             }
         }
-    });
-    // 修改密码
-    $('form').on('submit', function (e) {
-        e.preventDefault()
+    })
+
+    $('.layui-form').on('submit',function(e){
+        //阻止默认提交行为
+        e.preventDefault();
         $.ajax({
-            type: 'POST',
+            method: 'POST',
             url: '/my/updatepwd',
             data: $(this).serialize(),
-            success: function (res) {
-                // console.log(res);
-                if (res.status !== 0) {
-                    return layui.layer.msg(res.message)
+            success: function(res){
+                if(res.status !== 0){
+                    return layui.layer.msg('更新密码失败！')
                 }
-                layui.layer.msg('恭喜您修改密码成功!')
-                $('#form')[0].reset();
+                layui.layer.msg('更新密码成功！')
+
+                //重置表单 jquery[0] 拿到dom元素，reset 是form的方法
+                
+                $('.layui-form')[0].reset()
             }
         })
     })
+
 })

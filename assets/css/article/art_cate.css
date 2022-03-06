@@ -1,20 +1,22 @@
-body {
+html,body{
     margin: 0;
-    padding: 15px;
+    padding: 0;
 }
 
-#layui_box {
+body{
+    padding: 15px;
+    background-color: #f2f3f5; 
+}
+
+.layui-card-header{
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
 
-/* #layui_box button {
-    float: right;
-} */
 
-#form_add,
-#form_edit {
+
+#form-add,#form-edit{
     padding-top: 20px;
     padding-right: 30px;
 }

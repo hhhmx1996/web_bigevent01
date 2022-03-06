@@ -1,131 +1,120 @@
-// 入口函数
-$(function () {
+$(function(){
+
+    //使用layui
+    var layer = layui.layer
+    var form = layui.form
+
+
+    //获取文章分类的列表
+
     initArtCateList()
-    // 定义一个函数  渲染页面  获取文章分类列表
-    function initArtCateList() {
+
+    function initArtCateList(){
         $.ajax({
-            type: 'get',
-            url: '/my/article/cates',
-            success: function (res) {
-                console.log(res);
-                const str = template('i', { data: res.data });
-                $('tbody').html(str)
+            method:'GET',
+            url:'/my/article/cates',
+            success:function(res){
+                // console.log(res)
+                var htmlStr = template('tpl-table',res)
+                $('tbody').html(htmlStr)
             }
         })
-    };
-    let indexadd = null
-    let layer = layui.layer
-    // 点击弹出框   添加类别部分
-    $('#btnAdd').on('click', function () {
-        indexadd = layer.open({
-            type: 1,
-            title: '在线调试',
-            area: ['500px', '250px']
-            , content: $('#dialog_add').html()
-        });
-    });
+    }
 
-    // 立即提交部分
-    $('body').on('submit', '#form_add', function (e) {
-        e.preventDefault();
+    var indexAdd = null
+    
+    //为添加类别绑定点击事件
+    $('#btnAddCate').on('click' , function(){
+        indexAdd = layer.open({
+            type: 1,
+            area:['500px','250px'],
+            title: '添加文章分类',
+            content: $('#dialog-add').html() 
+        })            
+    })
+
+    // 通过代理的形式， 为form-add 表单绑定 submit 时间
+    $('body').on('submit','#form-add',function(e){
+        e.preventDefault()
         $.ajax({
-            type: 'post',
-            url: '/my/article/addcates',
-            data: $(this).serialize(),
-            success: function (res) {
-                // console.log(res);
-                if (res.status != 0) {
-                    return layer.msg(res.message)
+            method:'POST',
+            url:'/my/article/addcates',
+            data:$(this).serialize(),
+            success: function(res){
+                if(res.status !== 0){
+                    return layer.msg('新增分类失败！')
                 }
-                layer.msg('恭喜你添加成功了')
-                // 清空form表单
-                $('#form_add')[0].reset();
-                // 关闭对话框
-                layer.close(indexadd)
-                // 重新渲染页面
                 initArtCateList()
+                layer.msg('新增分类成功！')
+
+                //根据索引关闭对应的弹出层
+                layer.close(indexAdd)
             }
         })
-    });
+    })
 
-
-
-    //  根据 Id 获取文章分类数据
-    let form = layui.form
-    let editAdd = null
-    // 点击编辑页面
-    $('tbody').on('click', ".but_edit", function () {
-        // 弹出框
-        editAdd = layer.open({
+    //通过代理的形式，为btn-edit按钮绑定点击事件
+    var indexEdit = null
+    $('tbody').on('click','.btn-edit',function(){
+        //弹出一个修改文章分类信息的层
+        indexEdit = layer.open({
             type: 1,
-            area: ['500px', '300px'],
-            title: '在线调试'
-            , content: $('#dialog_edit').html()
-        });
-        // 发送ajax获取数据
-        let Id = $(this).attr('data-id');
-        console.log(Id);
+            area:['500px','250px'],
+            title: '添加文章分类',
+            content: $('#dialog-edit').html() 
+      
+        })
+        
+        var id = $(this).attr('data-id')
+         
+        //发起请求获取对应分类的数据
         $.ajax({
-            type: 'get',
-            url: '/my/article/cates/' + Id,
-            success: function (res) {
-                // console.log(res);
-                if (res.status != 0) {
-                    return layer.msg(res.message)
-                }
-                // 渲染到页面
-                form.val('form_edit', res.data)
+            method: 'GET',
+            url: '/my/article/cates/' + id,
+            success: function(res){
+                form.val('form-edit', res.data)
             }
-        });
-    });
+        })
+    })
 
-    // 确认修改部分
-    $('body').on('submit', '#form_edit', function (e) {
-        e.preventDefault();
+    //通过代理的形式，为修改分类的表单绑定submit事件
+    $('body').on('submit','#form-edit',function(e){
+        e.preventDefault()
         $.ajax({
-            type: 'post',
+            method: 'POST',
             url: '/my/article/updatecate',
-            data: $(this).serialize(),
-            success: function (res) {
-                // console.log(res);
-                if (res.status != 0) {
-                    return layer.msg(res.message)
+            data:$(this).serialize(),
+            success: function(res){
+                if(res.status !== 0){
+                    return layer.msg('更新分类数据失败！')
+
                 }
-                layer.msg('恭喜你修改成功了')
-                // 清空form表单
-                // $('#form_edit')[0].reset();
-                // 关闭对话框
-                layer.close(editAdd)
-                // 重新渲染页面
+                layer.msg('更新分类数据成功！')
+                layer.close(indexEdit)
+
                 initArtCateList()
             }
         })
-    });
+    })
 
-    // 删除  部分结构
-    $('tbody').on('click', ".remout", function () {
-        // console.log(1);
-        let Id = $(this).attr('data-id');
-        // 弹出提示框
-        layer.confirm('确定要删除吗', { icon: 5, title: '提示' },
-            function (index) {
-                $.ajax({
-                    type: "get",
-                    url: '/my/article/deletecate/' + Id,
-                    success: function (res) {
-                        if (res.status != 0) {
-                            return layer.msg(res.message)
-                        }
-                        // 渲染到页面
-                        layer.msg('恭喜你删除成功');
-                        // 重新加载页面
-                        initArtCateList()
+    //通过代理的形式，未删除按钮绑定点击事件
+    $('tbody').on('click','.btn-delete', function(){
+        var id = $(this).attr('data-id')
+        //提示用户是否要删除
+        layer.confirm('确认删除?', {icon: 3, title:'提示'}, function(index){
+            $.ajax({
+                method: 'GET',
+                url: '/my/article/deletecate/' + id,
+                success: function (res){
+                    if(res.status !== 0){
+                        return layer.msg('删除分类失败！')
                     }
-                })
-                //do something
+                    layer.msg('删除分类成功！')
+                    layer.close(index)
 
-                layer.close(index);
-            });
-
-    });
-})
+                    initArtCateList()
+                }  
+            })
+        })
+    })
+}) 

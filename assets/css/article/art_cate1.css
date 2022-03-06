@@ -1,0 +1,20 @@
+body {
+    margin: 0;
+    padding: 15px;
+}
+
+#layui_box {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* #layui_box button {
+    float: right;
+} */
+
+#form_add,
+#form_edit {
+    padding-top: 20px;
+    padding-right: 30px;
+}
